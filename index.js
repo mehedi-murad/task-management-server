@@ -28,6 +28,7 @@ async function run() {
     // await client.connect();
     // Send a ping to confirm a successful connection
     const userCollection = client.db("taskManager").collection("users")
+    const taskCollection = client.db("taskManager").collection("tasks")
 
 
     //for post users data endpoint
@@ -39,6 +40,46 @@ async function run() {
           return res.send({message:'User already exist', insertedId:null})
         }
         const result = await userCollection.insertOne(user)
+        res.send(result)
+      })
+    
+    //for task post endpoint
+    app.post('/tasks', async(req, res) => {
+        const mytasks = req.body;
+        const result = await taskCollection.insertOne(mytasks)
+        res.send(result)
+      })
+
+    //for getting task post endpoint
+    app.get('/tasks', async(req, res) => {
+        const result = await taskCollection.find().toArray()
+        res.send(result)
+      })
+
+    //for getting toDo details data enpoint
+    app.get('/tasks/:id', async(req,res) =>{
+        const id = req.params.id;
+        // console.log(id)
+        const query = {_id: new ObjectId(id)}
+        const result = await taskCollection.findOne(query)
+        res.send(result)
+      })
+    
+      //for updating to do task
+    app.put('/tasks/:id', async(req, res) => {
+        const id = req.params.id;
+        const filter = {_id: new ObjectId(id)}
+        const options = {upsert:true}
+        const updateToDo = req.body;
+        const toDoPost = {
+          $set: {
+            title: updateToDo.title, 
+            details: updateToDo.details, 
+            deadline: updateToDo.deadline, 
+            priority: updateToDo.priority
+          }
+        }
+        const result = await taskCollection.updateOne(filter, toDoPost, options)
         res.send(result)
       })
  
