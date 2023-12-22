@@ -29,6 +29,7 @@ async function run() {
     // Send a ping to confirm a successful connection
     const userCollection = client.db("taskManager").collection("users")
     const taskCollection = client.db("taskManager").collection("tasks")
+    const contactCollection = client.db("taskManager").collection("contact")
 
 
     //for post users data endpoint
@@ -87,6 +88,13 @@ async function run() {
         const id = req.params.id;
         const query = {_id: new ObjectId(id)}
         const result = await taskCollection.deleteOne(query)
+        res.send(result)
+      })
+    
+    //for contact data post endpoint
+    app.post('/contact', async(req, res) => {
+        const contactInfo = req.body;
+        const result = await contactCollection.insertOne(contactInfo)
         res.send(result)
       })
  
